@@ -28,16 +28,16 @@ flowchart LR
 
 ### Techniques used
 
-| Stage | Technique | Implementation |
-|--------|-----------|----------------|
-| **Ingestion** | PDF text extraction | `pdf-parse` in a Server Action |
-| **Chunking** | Recursive character splitting | `@langchain/textsplitters` (800 chars, 100 overlap) |
-| **Embedding** | Dense vectors (1536-d) | Vercel AI SDK `embed` / `embedMany` + OpenRouter `openai/text-embedding-3-small` |
-| **Storage** | Vector database | Neon Postgres + `pgvector` extension |
-| **Indexing** | Approximate nearest neighbor | HNSW index with `vector_cosine_ops` |
-| **Retrieval** | Semantic search | Drizzle `cosineDistance`, similarity threshold, top-k |
-| **Generation** | Tool-augmented chat | AI SDK `streamText` with required tool call + strict system prompt |
-| **Safety** | Per-user isolation + guardrails | `user_id` on all rows; auth checks; PDF-only answers |
+| Stage          | Technique                       | Implementation                                                                   |
+| -------------- | ------------------------------- | -------------------------------------------------------------------------------- |
+| **Ingestion**  | PDF text extraction             | `pdf-parse` in a Server Action                                                   |
+| **Chunking**   | Recursive character splitting   | `@langchain/textsplitters` (800 chars, 100 overlap)                              |
+| **Embedding**  | Dense vectors (1536-d)          | Vercel AI SDK `embed` / `embedMany` + OpenRouter `openai/text-embedding-3-small` |
+| **Storage**    | Vector database                 | Neon Postgres + `pgvector` extension                                             |
+| **Indexing**   | Approximate nearest neighbor    | HNSW index with `vector_cosine_ops`                                              |
+| **Retrieval**  | Semantic search                 | Drizzle `cosineDistance`, similarity threshold, top-k                            |
+| **Generation** | Tool-augmented chat             | AI SDK `streamText` with required tool call + strict system prompt               |
+| **Safety**     | Per-user isolation + guardrails | `user_id` on all rows; auth checks; PDF-only answers                             |
 
 ## Tech stack
 
@@ -133,12 +133,12 @@ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
 CLERK_SECRET_KEY=sk_test_...
 ```
 
-| Variable | Required | Purpose |
-|----------|----------|---------|
-| `NEON_DATABASE_URL` | Yes | Postgres + pgvector for document chunks |
-| `OPENROUTER_API_KEY` | Yes | LLM chat and embedding API calls |
-| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Yes | Clerk client |
-| `CLERK_SECRET_KEY` | Yes | Clerk server / middleware |
+| Variable                            | Required | Purpose                                 |
+| ----------------------------------- | -------- | --------------------------------------- |
+| `NEON_DATABASE_URL`                 | Yes      | Postgres + pgvector for document chunks |
+| `OPENROUTER_API_KEY`                | Yes      | LLM chat and embedding API calls        |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Yes      | Clerk client                            |
+| `CLERK_SECRET_KEY`                  | Yes      | Clerk server / middleware               |
 
 Do not commit `.env.local` (already in `.gitignore`).
 
@@ -183,48 +183,31 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Available scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start dev server (Turbopack) |
-| `npm run build` | Production build |
-| `npm run start` | Run production server |
-| `npm run lint` | Biome lint check |
-| `npm run format` | Biome format write |
-| `npx drizzle-kit migrate` | Apply DB migrations |
-| `npx drizzle-kit push` | Push schema to DB (dev alternative) |
-| `npx drizzle-kit studio` | Open Drizzle Studio |
+| Command                   | Description                         |
+| ------------------------- | ----------------------------------- |
+| `npm run dev`             | Start dev server (Turbopack)        |
+| `npm run build`           | Production build                    |
+| `npm run start`           | Run production server               |
+| `npm run lint`            | Biome lint check                    |
+| `npm run format`          | Biome format write                  |
+| `npx drizzle-kit migrate` | Apply DB migrations                 |
+| `npx drizzle-kit push`    | Push schema to DB (dev alternative) |
+| `npx drizzle-kit studio`  | Open Drizzle Studio                 |
 
 ## API routes
 
-| Route | Method | Description |
-|-------|--------|-------------|
-| `/api/chat` | POST | Streaming RAG chat (auth + uploaded PDF required) |
-| `/api/documents/status` | GET | `{ hasDocuments, chunkCount }` for current user |
+| Route                   | Method | Description                                       |
+| ----------------------- | ------ | ------------------------------------------------- |
+| `/api/chat`             | POST   | Streaming RAG chat (auth + uploaded PDF required) |
+| `/api/documents/status` | GET    | `{ hasDocuments, chunkCount }` for current user   |
 
 ## Configuration limits
 
-| Setting | Value | Location |
-|---------|-------|----------|
-| Max PDF size | 5 MB | `src/app/upload/actions.ts`, `next.config.ts` |
-| Max text chunks per PDF | 2000 | `src/app/upload/actions.ts` |
-| Embedding batch size | 512 | `src/lib/embeddings.ts` |
-| Chunk size | 800 chars | `src/lib/chunking.ts` |
-| Chat model | `openai/gpt-oss-120b:free` | `src/app/api/chat/route.ts` |
-| Embedding model | `openai/text-embedding-3-small` | `src/lib/embeddings.ts` |
-
-Change models in those files to any [OpenRouter-supported](https://openrouter.ai/models) IDs.
-
-## Deploy on Vercel
-
-1. Push the repo to GitHub and import in [Vercel](https://vercel.com/new).
-2. Add the same environment variables in the project settings.
-3. Run migrations against your production Neon database (`npx drizzle-kit migrate` locally or in CI).
-4. Deploy.
-
-## Learn more
-
-- [Vercel AI SDK](https://sdk.vercel.ai/docs)
-- [AI SDK tools](https://sdk.vercel.ai/docs/ai-sdk-core/tools-and-tool-calling)
-- [OpenRouter AI SDK provider](https://github.com/OpenRouterTeam/ai-sdk-provider)
-- [Neon + pgvector](https://neon.tech/docs/extensions/pgvector)
-- [Drizzle ORM](https://orm.drizzle.team/docs/overview)
+| Setting                 | Value                           | Location                                      |
+| ----------------------- | ------------------------------- | --------------------------------------------- |
+| Max PDF size            | 5 MB                            | `src/app/upload/actions.ts`, `next.config.ts` |
+| Max text chunks per PDF | 2000                            | `src/app/upload/actions.ts`                   |
+| Embedding batch size    | 512                             | `src/lib/embeddings.ts`                       |
+| Chunk size              | 800 chars                       | `src/lib/chunking.ts`                         |
+| Chat model              | `openai/gpt-oss-120b:free`      | `src/app/api/chat/route.ts`                   |
+| Embedding model         | `openai/text-embedding-3-small` | `src/lib/embeddings.ts`                       |
